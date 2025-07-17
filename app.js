@@ -196,9 +196,33 @@ function countEmptyProgress() {
   return jsonData.filter(item => !item.PROGRESS).length;
 }
 
+// Tambahkan mode 'cors' dan error handling
+const response = await fetch(SHEET_URL, {
+  mode: 'cors',
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+// Debug dengan menampilkan data mentah
+console.log("Data dari Google Sheets:", data.values);
+
+// Pastikan nama kolom sesuai
+const headers = data.values[0];
+console.log("Header kolom:", headers); // Cek apakah ada 'LINE', 'PROGRESS', dll
+
+// Tambahkan validasi
+if (!data.values || data.values.length < 2) {
+  throw new Error("Data kosong atau format tidak valid");
+}
+
 // Event listener
 document.getElementById('refreshBtn').addEventListener('click', fetchData);
 document.getElementById('floatRefresh').addEventListener('click', fetchData);
+
+// Pastikan chart di-destroy sebelum render ulang
+if (charts.lineChart) charts.lineChart.destroy();
 
 // Jalankan pertama kali
 fetchData();
